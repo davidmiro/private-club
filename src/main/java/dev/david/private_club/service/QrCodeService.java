@@ -19,14 +19,12 @@ public class QrCodeService {
 
     @Transactional
     public QrCodeResponseDto checkIn(UUID code) {
-        QrCode qrCode = qrCodeRepository.findByCode(code).
-                orElseThrow(() -> new IllegalArgumentException("Invalid or expired QR code!"));
+        QrCode qrCode = qrCodeRepository.findByCodeOrThrow(code);
         Member member = qrCode.getMember();
 
-        qrCodeRepository.delete(qrCode);
         QrCode newQrCode = new QrCode();
-        UUID newCode = UUID.randomUUID();
-        newQrCode.setCode(newCode);
+        qrCodeRepository.delete(qrCode);
+        newQrCode.setCode(UUID.randomUUID());
         newQrCode.setMember(member);
 
         qrCodeRepository.save(newQrCode);
@@ -35,17 +33,16 @@ public class QrCodeService {
                 member.getId(),
                 member.getFirstName(),
                 member.getLastName(),
-                newCode
+                newQrCode.getCode()
         );
     }
 
-    public QrCodeResponseDto generateFirstQrCode(Long memberId) {
-        Member member = memberRepository.findById(memberId).
-                orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public QrCodeResponseDto generateFirstQrCode(Long id) {
+        Member member = memberRepository.findMemberByIdOrThrow(id);
 
         QrCode newMemberQrCode = new QrCode();
-        UUID newCode = UUID.randomUUID();
-        newMemberQrCode.setCode(newCode);
+        newMemberQrCode.setCode(UUID.randomUUID());
+        
         newMemberQrCode.setMember(member);
 
         qrCodeRepository.save(newMemberQrCode);
@@ -54,6 +51,7 @@ public class QrCodeService {
                 member.getId(),
                 member.getFirstName(),
                 member.getLastName(),
-                newCode);
+                newMemberQrCode.getCode()
+        );
     }
 }

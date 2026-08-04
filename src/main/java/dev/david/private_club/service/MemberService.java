@@ -16,9 +16,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public MemberResponseDto getMemberById(Long id) {
-        Member member = findMemberEntityById(id);
-        return mapToResponseDto(member);
 
+        return mapToResponseDto(memberRepository.findMemberByIdOrThrow(id));
     }
 
     public MemberResponseDto createMember(@NonNull MemberCreateDto memberCreateDto) {
@@ -39,7 +38,7 @@ public class MemberService {
 
     public MemberResponseDto editMember(Long id, MemberUpdateDto memberUpdateDto) {
 
-        Member existingMember = findMemberEntityById(id);
+        Member existingMember = memberRepository.findMemberByIdOrThrow(id);
         existingMember.setFirstName(memberUpdateDto.firstName());
         existingMember.setLastName(memberUpdateDto.lastName());
         existingMember.setEmail(memberUpdateDto.email());
@@ -51,17 +50,10 @@ public class MemberService {
     }
 
     public void deleteMemberById(Long id) {
-        Member existingMember = memberRepository.findById(id).
-                orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
-        memberRepository.deleteById(id);
+        memberRepository.deleteMemberByIdOrThrow(id);
     }
 
-    public Member findMemberEntityById(Long id) {
-        return memberRepository.findById(id).
-                orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
-    }
-
-    public MemberResponseDto mapToResponseDto(Member member) {
+    private MemberResponseDto mapToResponseDto(Member member) {
         return new MemberResponseDto(
                 member.getId(),
                 member.getFirstName(),

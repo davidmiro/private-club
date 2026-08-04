@@ -27,5 +27,4 @@ public class QrCodeController {
         QrCodeResponseDto responseDto = qrCodeService.checkIn(code);
         return ResponseEntity.ok(responseDto);
     }
-
 }

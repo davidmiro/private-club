@@ -7,6 +7,6 @@ public record QrCodeResponseDto(
         Long memberId,
         String firstName,
         String lastName,
-        UUID id
+        UUID qrCode
 ) {
 }
