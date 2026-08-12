@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
 
@@ -93,5 +94,28 @@ public class QrCodeServiceTest {
         assertThat(result.lastName()).isEqualTo("Doe");
         assertThat(result.qrCode()).isEqualTo(saved.getCode());
 
+    }
+
+    @Test
+    void checkIn_shouldThrow_whenQrCodeNotFound() {
+        UUID code = UUID.randomUUID();
+
+        Mockito.when(qrCodeRepository.findByCodeOrThrow(code))
+                .thenThrow(new IllegalArgumentException("Invalid or expired QR code!"));
+
+        assertThatThrownBy(() -> qrCodeService.checkIn(code))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid or expired QR code!");
+    }
+
+    @Test
+    void generateFirstQrCode_shouldThrow_whenMemberNotFound() {
+        Long memberId = 999L;
+        Mockito.when(memberRepository.findMemberByIdOrThrow(memberId))
+                .thenThrow(new IllegalArgumentException("User not found"));
+
+        assertThatThrownBy(() -> qrCodeService.generateFirstQrCode(memberId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User not found");
     }
 }

@@ -30,16 +30,15 @@ public class MemberController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<MemberResponseDto> editMember(@PathVariable Long id,
+    ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long id,
                                                  @Valid @RequestBody MemberUpdateDto memberUpdateDto) {
-        MemberResponseDto responseDto = memberService.editMember(id, memberUpdateDto);
+        MemberResponseDto responseDto = memberService.updateMember(id, memberUpdateDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         memberService.deleteMemberById(id);
         return ResponseEntity.noContent().build();
     }
-
 }

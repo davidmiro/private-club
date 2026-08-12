@@ -97,7 +97,7 @@ public class MemberServiceTest {
         Mockito.when(memberRepository.save(any(Member.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        MemberResponseDto result = memberService.editMember(1L, memberUpdateDto);
+        MemberResponseDto result = memberService.updateMember(1L, memberUpdateDto);
 
         assertThat(existingMember.getFirstName()).isEqualTo("Joe");
         assertThat(existingMember.getLastName()).isEqualTo("Blow");
@@ -116,6 +116,42 @@ public class MemberServiceTest {
         memberService.deleteMemberById(1L);
 
         Mockito.verify(memberRepository).deleteMemberByIdOrThrow(1L);
+    }
+
+    @Test
+    void getMemberById_shouldThrow_whenMemberNotFound() {
+        Mockito.when(memberRepository.findMemberByIdOrThrow(1L))
+                .thenThrow(new IllegalArgumentException("User not found"));
+
+        assertThatThrownBy(() -> memberService.getMemberById(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User not found");
+    }
+
+    @Test
+    void editMember_shouldThrow_whenMemberNotFound() {
+        Long memberId = 999L;
+        MemberUpdateDto memberUpdateDto = new MemberUpdateDto("Joe", "Blow", "joe@mail.com",
+                LocalDate.of(1993, 12, 12));
+
+        Mockito.when(memberRepository.findMemberByIdOrThrow(memberId))
+                .thenThrow(new IllegalArgumentException("User not found"));
+
+        assertThatThrownBy(() -> memberService.updateMember(memberId, memberUpdateDto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User not found");
+    }
+
+    @Test
+    void deleteMember_shouldThrow_whenMemberNotFound() {
+        Long memberId = 999L;
+
+        Mockito.doThrow(new IllegalArgumentException("Member not found with id: " + memberId))
+                .when(memberRepository).deleteMemberByIdOrThrow(memberId);
+
+        assertThatThrownBy(() -> memberService.deleteMemberById(memberId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Member not found with id: " + memberId);
     }
 
     private Member createMember(Long id, String firstName, String lastName, String email, LocalDate dateOfBirth) {

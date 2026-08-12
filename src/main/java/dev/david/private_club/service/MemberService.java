@@ -36,7 +36,7 @@ public class MemberService {
         return mapToResponseDto(savedMember);
     }
 
-    public MemberResponseDto editMember(Long id, MemberUpdateDto memberUpdateDto) {
+    public MemberResponseDto updateMember(Long id, MemberUpdateDto memberUpdateDto) {
 
         Member existingMember = memberRepository.findMemberByIdOrThrow(id);
         existingMember.setFirstName(memberUpdateDto.firstName());
