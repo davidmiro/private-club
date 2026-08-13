@@ -1,65 +1,21 @@
 package dev.david.private_club.controller;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
+import dev.david.private_club.AbstractIntegrationTest;
 import dev.david.private_club.dto.MemberCreateDto;
 import dev.david.private_club.dto.MemberUpdateDto;
 import dev.david.private_club.model.Member;
-import dev.david.private_club.repository.MemberRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.testcontainers.utility.DockerImageName;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
-@SpringBootTest
-@AutoConfigureMockMvc
-class MemberControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-    @Container
-    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-
-        registry.add("spring.liquibase.enabled", () -> "true");
-        registry.add("spring.liquibase.change-log", () -> "classpath:db/changelog/db.changelog-master.xml");
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-
-    }
+class MemberControllerTest extends AbstractIntegrationTest {
 
     @Test
     @SneakyThrows
